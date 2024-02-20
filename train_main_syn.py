@@ -20,7 +20,7 @@ from tensorboardX import SummaryWriter
 from torch.optim.lr_scheduler import MultiStepLR
 from rcdnet import RCDNet
 from torch.utils.data import DataLoader
-from DerainDataset import TrainDataset
+from DerainDataset import TrainDataset, GTRainTrainDataset
 from math import ceil
 
 parser = argparse.ArgumentParser()
@@ -40,7 +40,7 @@ parser.add_argument("--milestone", type=int, default=[25,50,75], help="When to d
 parser.add_argument('--lr', type=float, default=0.001, help='initial learning rate')
 parser.add_argument("--use_gpu", type=bool, default=True, help='use GPU or not')
 parser.add_argument("--gpu_id", type=str, default="0", help='GPU id')
-parser.add_argument('--log_dir', default='./logs/', help='tensorboard logs')
+parser.add_argument('--log_dir', default='/root/tf-logs', help='tensorboard logs')
 parser.add_argument('--model_dir',default='./models/',help='saving model')
 parser.add_argument('--manualSeed', type=int, help='manual seed')
 opt = parser.parse_args()
@@ -140,7 +140,8 @@ if __name__ == '__main__':
         print('loaded checkpoints, epoch{:d}'.format(checkpoint['epoch']))
 
     # load dataset
-    train_dataset = TrainDataset(opt.data_path, opt.gt_path, opt.patchSize, int(opt.batchSize * opt.batchnum))
+    # train_dataset = TrainDataset(opt.data_path, opt.gt_path, opt.patchSize, int(opt.batchSize * opt.batchnum))
+    train_dataset = GTRainTrainDataset('./data/GT-RAIN_train/', opt.patchSize)
     # train model
     train_model(netDerain, optimizerDerain, schedulerDerain, train_dataset)
 
