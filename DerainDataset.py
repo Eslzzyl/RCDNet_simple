@@ -5,7 +5,7 @@ import random
 import h5py
 import torch
 import cv2
-import glob
+from glob import glob
 import torch.utils.data as udata
 import PIL.Image as Image
 from numpy.random import RandomState
@@ -86,14 +86,13 @@ class GTRainTrainDataset(udata.Dataset):
 
     def __getitem__(self, idx):
         file_name = self.mat_files[idx % self.file_num]
-        img_file = os.path.join(self.root_dir, file_name)
-        O = cv2.imread(img_file)
+        O = cv2.imread(file_name)
         b, g, r = cv2.split(O)
         input_img = cv2.merge([r, g, b])
         O, row, col = self.crop(input_img)
 
 
-        scene_name = file_name.split('/')[-1]
+        scene_name = file_name.split('/')[-2]
         gt_file = glob(self.root_dir + scene_name + '/*C-000.png')[0]
         B = cv2.imread(gt_file)
         b, g, r = cv2.split(B)

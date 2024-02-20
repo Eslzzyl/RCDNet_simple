@@ -3,13 +3,13 @@ import torch
 import re
 import torch.nn as nn
 import numpy as np
-from skimage.measure.simple_metrics import compare_psnr
-import  os
-import glob 
+from skimage.metrics import peak_signal_noise_ratio
+import os
+from glob import glob
 
 
 def findLastCheckpoint(save_dir):
-    file_list = glob.glob(os.path.join(save_dir, '*epoch*.pth'))
+    file_list = glob(os.path.join(save_dir, '*epoch*.pth'))
     if file_list:
         epochs_exist = []
         for file_ in file_list:
@@ -26,7 +26,7 @@ def batch_PSNR(img, imclean, data_range):
     Iclean = imclean.data.cpu().numpy().astype(np.float32)
     PSNR = 0
     for i in range(Img.shape[0]):
-        PSNR += compare_psnr(Iclean[i,:,:,:], Img[i,:,:,:], data_range=data_range)
+        PSNR += peak_signal_noise_ratio(Iclean[i,:,:,:], Img[i,:,:,:], data_range=data_range)
     return (PSNR/Img.shape[0])
 
 

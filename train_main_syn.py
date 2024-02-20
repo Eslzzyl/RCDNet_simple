@@ -141,7 +141,7 @@ if __name__ == '__main__':
 
     # load dataset
     # train_dataset = TrainDataset(opt.data_path, opt.gt_path, opt.patchSize, int(opt.batchSize * opt.batchnum))
-    train_dataset = GTRainTrainDataset('./data/GT-RAIN_train/', opt.patchSize)
+    train_dataset = GTRainTrainDataset(opt.data_path, opt.patchSize)
     # train model
     train_model(netDerain, optimizerDerain, schedulerDerain, train_dataset)
 
