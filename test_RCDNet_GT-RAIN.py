@@ -53,8 +53,12 @@ def main():
     outer_count = 0
     # 列出 opt.data_path 下的所有目录
     scene_names = os.listdir(opt.data_path)
+    print('Testing model...')
+    psnr_in_total = 0
+    ssim_in_total = 0
+    psnr_out_total = 0
+    ssim_out_total = 0
     for scene_name in scene_names:
-        print("Scene: " + scene_name)
         scene_path = os.path.join(opt.data_path, scene_name)
         out_path = os.path.join(opt.save_path, scene_name)
         os.makedirs(out_path, exist_ok=True)
@@ -73,8 +77,12 @@ def main():
                 O = cv2.cvtColor(O, cv2.COLOR_BGR2RGB)
 
                 input_img = np.array(O)
-                psnr_in += psnr(clean_img, input_img)
-                ssim_in += ssim(clean_img, input_img, multichannel=True, channel_axis=-1, data_range=255)
+                temp = psnr(clean_img, input_img)
+                psnr_in += temp
+                psnr_in_total += temp
+                temp = ssim(clean_img, input_img, multichannel=True, channel_axis=-1, data_range=255)
+                ssim_in += temp
+                ssim_in_total += temp
 
                 O = np.expand_dims(O.transpose(2, 0, 1), 0)
                 O = torch.Tensor(O)
@@ -98,8 +106,12 @@ def main():
                     save_out = np.uint8(out.data.numpy().squeeze())
                 save_out = save_out.transpose(1, 2, 0)
 
-                psnr_out += psnr(clean_img, save_out)
-                ssim_out += ssim(clean_img, save_out, multichannel=True, channel_axis=-1, data_range=255)
+                temp = psnr(clean_img, save_out)
+                psnr_out += temp
+                psnr_out_total += temp
+                temp = ssim(clean_img, save_out, multichannel=True, channel_axis=-1, data_range=255)
+                ssim_out += temp
+                ssim_out_total += temp
 
                 save_out = cv2.cvtColor(save_out, cv2.COLOR_BGR2RGB)
                 cv2.imwrite(os.path.join(out_path, img_name), save_out)
@@ -110,8 +122,13 @@ def main():
         ssim_in /= inner_count
         psnr_out /= inner_count
         ssim_out /= inner_count
-        print(f"Scene: {scene_name}, PSNR in: {psnr_in}, SSIM in: {ssim_in} PSNR out: {psnr_out}, SSIM out: {ssim_out}")
-    print('Avg. time:', time_test/outer_count)
+        print(f"Scene: {scene_name}, PSNR in: {psnr_in:.2f}, SSIM in: {ssim_in:.4f} PSNR out: {psnr_out:.2f}, SSIM out: {ssim_out:.4f}")
+    psnr_in_total /= outer_count
+    ssim_in_total /= outer_count
+    psnr_out_total /= outer_count
+    ssim_out_total /= outer_count
+    print(f"Overall PSNR in: {psnr_in_total:.2f}, SSIM in: {ssim_in_total:.4f} PSNR out: {psnr_out_total:.2f}, SSIM out: {ssim_out_total:.4f}")
+    print('Avg. time:', time_test / outer_count)
 
 
 if __name__ == "__main__":
