@@ -80,7 +80,15 @@ def main():
                 temp = psnr(clean_img, input_img)
                 psnr_in += temp
                 psnr_in_total += temp
-                temp = ssim(clean_img, input_img, multichannel=True, channel_axis=-1, data_range=255)
+                # 以下的计算SSIM指标的方法是去雨任务中约定俗成的方式。
+                # 将图像从RGB转换到YCbCr
+                clean_img_ycbcr = cv2.cvtColor(clean_img, cv2.COLOR_RGB2YCrCb)
+                input_img_ycbcr = cv2.cvtColor(input_img, cv2.COLOR_RGB2YCrCb)
+                # 分解YCbCr图像为三个通道
+                y_clean, _, _ = cv2.split(clean_img_ycbcr)
+                y_input, _, _ = cv2.split(input_img_ycbcr)
+                # 在亮度通道（Y通道）上计算SSIM
+                temp = ssim(y_clean, y_input, data_range=255)
                 ssim_in += temp
                 ssim_in_total += temp
 
@@ -109,7 +117,14 @@ def main():
                 temp = psnr(clean_img, save_out)
                 psnr_out += temp
                 psnr_out_total += temp
-                temp = ssim(clean_img, save_out, multichannel=True, channel_axis=-1, data_range=255)
+                # 将图像从RGB转换到YCbCr
+                clean_img_ycbcr = cv2.cvtColor(clean_img, cv2.COLOR_RGB2YCrCb)
+                out_img_ycbcr = cv2.cvtColor(save_out, cv2.COLOR_RGB2YCrCb)
+                # 分解YCbCr图像为三个通道
+                y_clean, _, _ = cv2.split(clean_img_ycbcr)
+                y_out, _, _ = cv2.split(out_img_ycbcr)
+                # 在亮度通道（Y通道）上计算SSIM
+                temp = ssim(y_clean, y_out, data_range=255)
                 ssim_out += temp
                 ssim_out_total += temp
 
